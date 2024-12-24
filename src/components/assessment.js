@@ -163,7 +163,7 @@ const AssessmentPage = () => {
 
             </div>
             {!defaultInstruction && (
-                <h3 className='text-align'>What is your Name</h3>
+                <h3 className='text-align'>What is your Name {questions}</h3>
             )
             }
 
