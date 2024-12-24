@@ -36,8 +36,8 @@ const AssessmentPage = () => {
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                {/** replace with correct url */}
-                const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+                {/** replace with correct url and payload  */}
+                const response = await axios.post('http://20.204.110.86:8000/api/v1/interview/initiate', payload);
                 setQuestions(response.data.questions);
                 startRecording();
                 setstartInterview(false);
@@ -76,8 +76,8 @@ const AssessmentPage = () => {
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                {/** replace with correct url */}
-                const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+                {/** replace with correct url and payload  */}
+                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, payload);
                 setQuestions(response.data.questions);
                 setLoading(true);
                 if (response && response !== undefined) {
@@ -96,8 +96,8 @@ const AssessmentPage = () => {
     const closeInterview = async () => {
         try {
             const payload = { resume_id: resumeId };
-            {/** replace with correct url */}
-            const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+            {/** replace with correct url and payload  */}
+            const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, payload);
             setQuestions(response.data.questions);
             setLoading(true);
             if (streamRef.current) {
