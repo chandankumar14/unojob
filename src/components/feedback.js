@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-
 const FeedbackPage = () => {
     const [feedback, setFeedback] = useState('');
-    const [rating, setRating] = useState(0); // New state for rating
+    const [rating, setRating] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     const handleFeedbackChange = (e) => {

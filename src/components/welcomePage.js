@@ -34,7 +34,7 @@ const WelcomeScreen = () => {
     try {
       setLoading(true);  
       setIsUploading(true); 
-      const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', formData, {
+      const response = await axios.post('http://20.204.110.86:8000/api/v1/resume/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -45,11 +45,7 @@ const WelcomeScreen = () => {
       setAssesment(true);
       setIsUploadingStatus(false);
     } catch (error) {
-      const resumeId = "wertyui2345"; 
-      dispatch(setResumeId(resumeId));
-      setIsUploadingStatus(false);
-      setAssesment(true);
-      console.error('Error uploading resume:', error);
+      console.log(error)
       alert('There was an error uploading your resume. Please try again.');
     } finally {
       setLoading(false);  

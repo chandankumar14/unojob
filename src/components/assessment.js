@@ -13,7 +13,6 @@ const AssessmentPage = () => {
     const [MediaPermissions, setMediaPermissions] = useState(true);
     const [startInterview, setstartInterview] = useState(false);
     const [defaultInstruction, setDefaultInstruction] = useState(true)
-    const [counter, setCounter] = useState(0);
     const mediaRecorderRef = useRef(null);
     const videoRef = useRef(null);
     const streamRef = useRef(null);
@@ -22,23 +21,6 @@ const AssessmentPage = () => {
 
     const resumeId = useSelector((state) => state.resume.resumeId);
     const navigate = useNavigate();
-    const QuestionList = [{
-        questionId: 1,
-        Question: "What is JavaScript"
-    },
-    {
-        questionId: 2,
-        Question: "Explain Array Method"
-    },
-    {
-        questionId: 3,
-        Question: "What is Call Back Function"
-    },
-    {
-        questionId: 4,
-        Question: "What is Decorator"
-    }]
-
     const getMediaPermissions = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -56,8 +38,8 @@ const AssessmentPage = () => {
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                // const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
-                // setQuestions(response.data.questions);
+                const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+                setQuestions(response.data.questions);
                 startRecording();
                 setstartInterview(false);
                 setDefaultInstruction(false)
@@ -95,34 +77,45 @@ const AssessmentPage = () => {
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                // const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
-                // setQuestions(response.data.questions);
-                if (setCounter(counter + 2) !== QuestionList.length) {
-                    setCounter(counter + 1);
-                    console.log(counter)
-                }
-
-                startRecording();
+                const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+                setQuestions(response.data.questions);
                 setLoading(true);
-                if (counter === 3) {
-                    navigate('/feedback');
-                    if (streamRef.current) {
-                        const tracks = streamRef.current.getTracks();
-                        tracks.forEach((track) => {
-                            track.stop();
-                        });
-                        streamRef.current.getTracks().forEach(track => track.stop());
-                        streamRef.current = null;
-                        videoRef.current.srcObject = null;
-                    }
-
+                if (response && response !== undefined) {
+                    startRecording();
+                    setLoading(false);
                 }
             } catch (error) {
                 console.error("Error fetching questions:", error);
+                setLoading(false);
             } finally {
                 setLoading(false);
             }
         }
+    }
+
+    const closeInterview = async () => {
+        try {
+            const payload = { resume_id: resumeId };
+            const response = await axios.post('https://api.escuelajs.co/api/v1/files/upload', payload);
+            setQuestions(response.data.questions);
+            setLoading(true);
+            if (streamRef.current) {
+                const tracks = streamRef.current.getTracks();
+                tracks.forEach((track) => {
+                    track.stop();
+                });
+                streamRef.current.getTracks().forEach(track => track.stop());
+                streamRef.current = null;
+                videoRef.current.srcObject = null;
+            }
+            navigate('/feedback');
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching questions:", error);
+        } finally {
+            setLoading(false);
+        }
+
     }
 
     return (
@@ -169,7 +162,7 @@ const AssessmentPage = () => {
 
             </div>
             {!defaultInstruction && (
-                <h3 className='text-align'>{QuestionList[counter].questionId}: {QuestionList[counter].Question}</h3>
+                <h3 className='text-align'>What is your Name</h3>
             )
             }
 
