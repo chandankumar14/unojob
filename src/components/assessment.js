@@ -12,12 +12,12 @@ const AssessmentPage = () => {
     const [isAccessGranted, setIsAccessGranted] = useState(false);
     const [MediaPermissions, setMediaPermissions] = useState(true);
     const [startInterview, setstartInterview] = useState(false);
-    const [defaultInstruction, setDefaultInstruction] = useState(true)
+    const [defaultInstruction, setDefaultInstruction] = useState(true);
+    const [baseAudio, setAudiofile] = useState(null);
     const mediaRecorderRef = useRef(null);
     const videoRef = useRef(null);
     const streamRef = useRef(null);
     const timerRef = useRef(null);
-    const base64Audio = "data:audio/mp3;base64,string-file value"
     const resumeId = useSelector((state) => state.resume.resumeId);
     const navigate = useNavigate();
     const getMediaPermissions = async () => {
@@ -33,15 +33,22 @@ const AssessmentPage = () => {
         }
     };
     const startInterviewProcess = async () => {
+        setstartInterview(false);
+        setDefaultInstruction(false)
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                {/** replace with correct url and payload  */}
-                const response = await axios.post('http://20.204.110.86:8000/api/v1/interview/initiate', payload);
-                setQuestions(response.data.questions);
-                startRecording();
-                setstartInterview(false);
-                setDefaultInstruction(false)
+                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/initiate/${resumeId}`, payload);
+                if (response && response !== undefined) {
+                    const audioResponse = response?.data?.audio_response;
+                    const audioBase64Value = `data:audio/mp3;base64,${audioResponse}`;
+                    setAudiofile(audioBase64Value);
+                    setQuestions(response.data.gpt_response);
+                    setstartInterview(false);
+                    setDefaultInstruction(false);
+
+                }
+
             } catch (error) {
                 console.error("Error fetching questions:", error);
             }
@@ -75,13 +82,20 @@ const AssessmentPage = () => {
     const SaveAndNext = async () => {
         if (resumeId) {
             try {
-                const payload = { resume_id: resumeId };
-                {/** replace with correct url and payload  */}
-                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, payload);
-                setQuestions(response.data.questions);
+                const formData = new FormData();
+                formData.append('file', new File([videoUrl], 'recording.wav', { type: 'audio/wav' }));
+                {/** replace with correct url and payload  */ }
+                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    }
+                );
                 setLoading(true);
                 if (response && response !== undefined) {
-                    startRecording();
+                    setAudiofile(`data:audio/mp3;base64,${response.data.audio_response}`);
+                    setQuestions(response.data.transcription);
                     setLoading(false);
                 }
             } catch (error) {
@@ -95,9 +109,10 @@ const AssessmentPage = () => {
 
     const closeInterview = async () => {
         try {
-            const payload = { resume_id: resumeId };
-            {/** replace with correct url and payload  */}
-            const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, payload);
+            const formData = new FormData();
+            formData.append('file', videoRef);
+            {/** replace with correct url and payload  */ }
+            const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData);
             setQuestions(response.data.questions);
             setLoading(true);
             if (streamRef.current) {
@@ -109,8 +124,9 @@ const AssessmentPage = () => {
                 streamRef.current = null;
                 videoRef.current.srcObject = null;
             }
-            navigate('/feedback');
             setLoading(false);
+            navigate('/feedback');
+
         } catch (error) {
             console.error("Error fetching questions:", error);
         } finally {
@@ -129,10 +145,6 @@ const AssessmentPage = () => {
             )}
             {defaultInstruction && (
                 <div>
-                    <audio controls autoplay className='btn-margin'>
-                        <source src={base64Audio} type="audio/mp3" />
-
-                    </audio>
                     <h3 className='text-align'>Instructions:</h3>
                     <ul>
                         <li>Find a quiet, well-lit area: To ensure the best possible quality for your video, try to record in a quiet, well-lit area. Avoid noisy or dimly lit locations, as these can make your video difficult to hear or see.</li>
@@ -153,21 +165,27 @@ const AssessmentPage = () => {
                     </button>
                 )}
             </div>
-            <div>
-                {/* Display the recording timer */}
-                {isRecording && (
-                    <div className="timer">
-                        <p>Timer: {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}</p>
-                    </div>
-                )}
 
-            </div>
             {!defaultInstruction && (
-                <h3 className='text-align'>What is your Name {questions}</h3>
+                <audio controls autoPlay className='btn-margin'>
+                    <source src={baseAudio} type="audio/mp3" />
+                </audio>
+            )}
+            {!defaultInstruction && (
+                <h3 className='text-align'>{questions}</h3>
             )
             }
 
             <div className='main-container'>
+                <div>
+                    {/* Display the recording timer */}
+                    {isRecording && (
+                        <div>
+                            <button type="button" className="btn btn-danger">Rec</button>
+                            <button type="button" className="btn btn-dark">{Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}</button>
+                        </div>
+                    )}
+                </div>
                 <video className='video-width' ref={videoRef} autoPlay muted></video>
             </div>
 
@@ -183,13 +201,24 @@ const AssessmentPage = () => {
 
             <div>
                 {isAccessGranted && !isRecording && !startInterview && (
-                    <button
-                        type="button"
-                        className="btn-action btn-margin"
-                        onClick={SaveAndNext}
-                    >
-                        Submit
-                    </button>
+                    <div>
+                        <span className='text-style'> Note: The Video is being recorded</span>
+                        <button
+                            type="button"
+                            className="btn-action btn-start-recording btn-display"
+                            onClick={startRecording}
+                        >
+                            Start Recording
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn-action btn-display"
+                            onClick={stopRecording}
+                        >
+                            Stop Recording
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -198,7 +227,7 @@ const AssessmentPage = () => {
                     <button
                         type="button"
                         className="btn-action btn-margin"
-                        onClick={stopRecording}
+                        onClick={SaveAndNext}
                     >
                         <span> Stop Recording</span>
                     </button>

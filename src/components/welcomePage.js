@@ -39,11 +39,15 @@ const WelcomeScreen = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      const resumeId = "wertyui2345"; 
-      console.log(response);
-      dispatch(setResumeId(resumeId));
-      setAssesment(true);
-      setIsUploadingStatus(false);
+      if(response && response!==undefined){
+        const data = response.data;
+        const resumeId = data.resume_id;
+        console.log(resumeId);
+        dispatch(setResumeId(resumeId));
+        setAssesment(true);
+        setIsUploadingStatus(false);
+      }
+     
     } catch (error) {
       console.log(error)
       alert('There was an error uploading your resume. Please try again.');
