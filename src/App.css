@@ -150,6 +150,10 @@
 .text-align {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
+  margin-left: 5%;
+  background: chocolate;
+  padding: 20px;
+  border-radius: 10px;
 }
 
 .stop-recording {

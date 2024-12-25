@@ -8,6 +8,8 @@ const AssessmentPage = () => {
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
     const [videoUrl, setVideoUrl] = useState(null);
+    const [blobUrl, setBlobUrl] = useState(null);
+    const [recordedAudio, setRecordedaudio] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [isAccessGranted, setIsAccessGranted] = useState(false);
     const [MediaPermissions, setMediaPermissions] = useState(true);
@@ -40,13 +42,10 @@ const AssessmentPage = () => {
                 const payload = { resume_id: resumeId };
                 const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/initiate/${resumeId}`, payload);
                 if (response && response !== undefined) {
-                    const audioResponse = response?.data?.audio_response;
-                    const audioBase64Value = `data:audio/mp3;base64,${audioResponse}`;
-                    setAudiofile(audioBase64Value);
+                    setAudiofile(`data:audio/mp3;base64,${response.data.audio_response}`);
                     setQuestions(response.data.gpt_response);
                     setstartInterview(false);
                     setDefaultInstruction(false);
-
                 }
 
             } catch (error) {
@@ -63,7 +62,8 @@ const AssessmentPage = () => {
         const chunks = [];
         mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
         mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/webm' });
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            setBlobUrl(blob)
             const url = URL.createObjectURL(blob);
             setVideoUrl(url);
             clearInterval(timerRef.current);
@@ -78,34 +78,50 @@ const AssessmentPage = () => {
         setIsRecording(false);
         mediaRecorderRef.current.stop();
     };
-
     const SaveAndNext = async () => {
         if (resumeId) {
             try {
-                const formData = new FormData();
-                formData.append('file', new File([videoUrl], 'recording.wav', { type: 'audio/wav' }));
-                {/** replace with correct url and payload  */ }
-                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData,
-                    {
+                mediaRecorderRef.current.stop();
+                const base64ToBlob = (base64, contentType = 'audio/wav') => {
+                    const byteCharacters = atob(base64.split(',')[1]);
+                    const byteArrays = [];
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length).fill(0).map((_, i) => slice.charCodeAt(i));
+                        byteArrays.push(new Uint8Array(byteNumbers));
+                    }
+                    return new Blob(byteArrays, { type: contentType });
+                };
+                const reader = new FileReader();
+                reader.readAsDataURL(blobUrl);
+                reader.onloadend = async () => {
+                    setLoading(true);
+                    setIsRecording(false);
+                    const base64Audio = reader.result;
+                    setRecordedaudio(base64Audio);
+                    const audioBlob = base64ToBlob(base64Audio);
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, 'recording.wav');
+                    const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
+                    });
+                    if (response && response !== undefined) {
+                        setAudiofile(`data:audio/mp3;base64,${response.data.audio_response}`);
+                        setQuestions(response.data.gpt_response);
+                        setLoading(false);
                     }
-                );
-                setLoading(true);
-                if (response && response !== undefined) {
-                    setAudiofile(`data:audio/mp3;base64,${response.data.audio_response}`);
-                    setQuestions(response.data.transcription);
-                    setLoading(false);
-                }
+                };
             } catch (error) {
                 console.error("Error fetching questions:", error);
-                setLoading(false);
             } finally {
                 setLoading(false);
             }
         }
-    }
+    };
+
+
 
     const closeInterview = async () => {
         try {
@@ -137,7 +153,6 @@ const AssessmentPage = () => {
 
     return (
         <div className="assessment-page">
-
             {loading && (
                 <div className="loading-overlay">
                     <div className="spinner"></div>
@@ -223,14 +238,19 @@ const AssessmentPage = () => {
             </div>
 
             <div className='stop-recording'>
+
                 {isRecording && (
-                    <button
-                        type="button"
-                        className="btn-action btn-margin"
-                        onClick={SaveAndNext}
-                    >
-                        <span> Stop Recording</span>
-                    </button>
+                    <div>
+                        <span className='text-style'> Note: The Video is being recorded</span>
+                        <button
+                            type="button"
+                            className="btn-action btn-margin"
+                            onClick={SaveAndNext}
+                        >
+                            <span> Stop Recording</span>
+                        </button>
+                    </div>
+
                 )}
             </div>
         </div>
