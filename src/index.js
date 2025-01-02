@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import Store from "./redux/store"
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import InterViewSummary from "./components/summary"
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ root.render(
         <Route path="/" element={<WelcomePage />} />
         <Route path="/assessment" element={<AssessmentPage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/summary" element={<InterViewSummary />} />
       </Routes>
     </Router>
     </Provider>
