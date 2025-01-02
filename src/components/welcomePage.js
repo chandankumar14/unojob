@@ -34,7 +34,7 @@ const WelcomeScreen = () => {
     try {
       setLoading(true);  
       setIsUploading(true); 
-      const response = await axios.post('http://20.204.110.86:8000/api/v1/resume/upload', formData, {
+      const response = await axios.post('https://ai-interview.unojobs.com:8000/api/v1/resume/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -40,7 +40,7 @@ const AssessmentPage = () => {
         if (resumeId) {
             try {
                 const payload = { resume_id: resumeId };
-                const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/initiate/${resumeId}`, payload);
+                const response = await axios.post(`https://ai-interview.unojobs.com:8000/api/v1/interview/initiate/${resumeId}`, payload);
                 if (response && response !== undefined) {
                     setAudiofile(`data:audio/mp3;base64,${response.data.audio_response}`);
                     setQuestions(response.data.gpt_response);
@@ -96,13 +96,14 @@ const AssessmentPage = () => {
                 reader.readAsDataURL(blobUrl);
                 reader.onloadend = async () => {
                     setLoading(true);
+                    setAudiofile(null);
                     setIsRecording(false);
                     const base64Audio = reader.result;
                     setRecordedaudio(base64Audio);
                     const audioBlob = base64ToBlob(base64Audio);
                     const formData = new FormData();
                     formData.append('file', audioBlob, 'recording.wav');
-                    const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData, {
+                    const response = await axios.post(`https://ai-interview.unojobs.com:8000/api/v1/interview/${resumeId}`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -128,7 +129,7 @@ const AssessmentPage = () => {
             const formData = new FormData();
             formData.append('file', videoRef);
             {/** replace with correct url and payload  */ }
-            const response = await axios.post(`http://20.204.110.86:8000/api/v1/interview/${resumeId}`, formData);
+            const response = await axios.post(`https://ai-interview.unojobs.com:8000/api/v1/interview/${resumeId}`, formData);
             setQuestions(response.data.questions);
             setLoading(true);
             if (streamRef.current) {
@@ -181,7 +182,7 @@ const AssessmentPage = () => {
                 )}
             </div>
 
-            {!defaultInstruction && (
+            {!defaultInstruction && baseAudio && (
                 <audio controls autoPlay className='btn-margin'>
                     <source src={baseAudio} type="audio/mp3" />
                 </audio>
