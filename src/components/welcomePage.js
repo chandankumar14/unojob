@@ -109,7 +109,7 @@ const WelcomeScreen = () => {
           onClick={handleStartAssessment}
           className="btn-action btn-margin"
         >
-          Start Assessment
+          Next
         </button>
       )}
     </div>

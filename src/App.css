@@ -57,13 +57,11 @@
 
 .video-width {
   width: 100%;
-  height: 500px;
-  border-radius: 5px;
+ border-radius: 5px;
 }
 
 .main-container {
   width: 90%;
-  height: 500px;
   margin: 20px;
 }
 
@@ -99,22 +97,31 @@
     transform: rotate(360deg);
   }
 }
-.btn-display{
+
+.btn-display {
   display: inline-block;
   vertical-align: top;
   align-items: center;
-  margin-left:15%;
+  margin-left: 15%;
   margin-top: -5px;
 }
-.btn-start-recording{
-  background-color: #343a40;
+
+.btn-start-recording {
+  background-color: #1270ce;
+  position: absolute;
+  margin-top: -450px;
+  margin-left: 170px;
+  height: 60px;
+  width: 200px;
 }
-.text-style{
+
+.text-style {
   color: #343a40;
   padding-left: 10px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: medium;
 }
+
 .btn-dark {
   color: #fff;
   background-color: #343a40;
@@ -129,7 +136,7 @@
   cursor: pointer;
   float: left;
   position: absolute;
-  margin-left:19%;
+  margin-left: 5%;
   margin-top: 20px;
 }
 
@@ -143,14 +150,13 @@
   cursor: pointer;
   float: left;
   position: absolute;
-  margin-left: 16%;
+  margin-left: 1%;
   margin-top: 20px;
 }
 
 .text-align {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
-  margin-left: 5%;
   background: chocolate;
   padding: 20px;
   border-radius: 10px;
@@ -179,6 +185,7 @@
   width: 80%;
   margin: 0 auto;
 }
+
 .options {
   display: flex;
   flex-direction: column;
@@ -208,3 +215,9 @@
 .submit-btn:hover {
   background-color: #0056b3;
 }
+
+.StopInterview {
+  background-color: #e73b1d;
+  color: #ffffff;
+  float: right;
+ }

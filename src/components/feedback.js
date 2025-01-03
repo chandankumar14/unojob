@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const FeedbackPage = () => {
     const [feedback, setFeedback] = useState('');
     const [rating, setRating] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
-
+    const navigate = useNavigate();
     const handleFeedbackChange = (e) => {
         setFeedback(e.target.value);
     };
@@ -19,6 +20,9 @@ const FeedbackPage = () => {
         }
     };
 
+    const handleStartSummary = () => {
+        navigate('/summary');
+    };
     const renderStars = () => {
         const stars = [];
         for (let i = 0; i < 5; i++) {
@@ -67,6 +71,11 @@ const FeedbackPage = () => {
                     <h2>Thank You!</h2>
                     <p>Your feedback has been successfully submitted. We truly appreciate your input!</p>
                     <p>Your Rating: {rating} out of 5</p> {/* Display rating */}
+
+                    <button type="submit" className="submit-btn"
+                        onClick={handleStartSummary}>
+                        View InterViewSummary
+                    </button>
                 </div>
             )}
         </div>
