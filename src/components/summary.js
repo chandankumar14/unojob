@@ -25,13 +25,14 @@ const InterviewSummary = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
-                const response = await fetch('https://api.example.com/data');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const result = await response.json();
-                setData(result);
+                // setLoading(true);
+                // const response = await fetch('https://api.example.com/data');
+                // if (!response.ok) {
+                //     throw new Error('Network response was not ok');
+                // }
+                // const result = await response.json();
+                // setData(result);
+                console.log(localStorage.getItem("AllVideoURL"))
 
             } catch (error) {
                 setError(error);

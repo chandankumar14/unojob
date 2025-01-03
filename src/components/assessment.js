@@ -11,6 +11,7 @@ const AssessmentPage = () => {
     const [audioPlayer, setAudioPlayer] = useState(null);
     const [videoBlobUrl, setVideooBlobUrl] = useState(null);
     const [VideoPlayer, setVideoPlayer] = useState(null);
+    const [AllVideoUrl, setAllVideoUrl] =useState([])
     const [questions, setQuestions] = useState([]);
     const [isAccessGranted, setIsAccessGranted] = useState(false);
     const [MediaPermissions, setMediaPermissions] = useState(true);
@@ -90,6 +91,7 @@ const AssessmentPage = () => {
                         videoUrl = URL.createObjectURL(videoBlob);
                         setVideooBlobUrl(videoUrl);
                         setVideoPlayer(videoUrl);
+                        setAllVideoUrl(prev=>[...prev,videoUrl])
                     }
                     resolve({ audioUrl, audioBlob, videoBlob, videoUrl });
                 };
@@ -110,7 +112,7 @@ const AssessmentPage = () => {
             const totalVolume = dataArray.reduce((acc, value) => acc + value, 0);
             const averageVolume = totalVolume / bufferLength;
             console.log(averageVolume, "averageVolume");
-            if (averageVolume < 30) {
+            if (averageVolume < 5) {
                 if (silenceStartRef.current === 0) {
                     silenceStartRef.current = Date.now();
                 } else if (Date.now() - silenceStartRef.current > 10000) {
@@ -191,6 +193,7 @@ const AssessmentPage = () => {
             if (timerRef.current) {
                 clearInterval(timerRef.current);
             }
+            localStorage.setItem("AllVideoURL",AllVideoUrl)
             navigate('/feedback');
         }
     }
