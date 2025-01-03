@@ -193,10 +193,6 @@ const AssessmentPage = () => {
             }
             navigate('/feedback');
         }
-
-
-
-
     }
 
     return (
