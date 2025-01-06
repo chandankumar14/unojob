@@ -21,7 +21,25 @@ const InterviewSummary = () => {
             options: ["Oxygen", "Osmium", "Ozone", "Oganesson"],
         },
     ];
-
+   
+    // Sample:
+    // Request:
+    //  curl -X POST https://ai-interview.unojobs.com:8000/api/v1/summary/bda069a3-9998-4648-93fc-2ce6022ad923 -H "Content-Type: application/json" -d 
+    
+    
+    // Response:
+    //  Stream of .....
+    // {           "id": id,
+    //             "transcription": transcription,
+    //             "gpt_response": gpt_response,
+    //             "transcription_audio": transcription_audio,
+    //             "gpt_response_audio": gpt_response_audio,
+    //             "created_at": reated_at
+    // }
+    
+    // > NOTE: THIS IS A STREAM OF CONVERSATIONS, NOT A JSON LIST,  THIS APPROACH IS USED TO HANDLE LONGER CONVERSATION AND AUDIO RESPONSES.
+    
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
