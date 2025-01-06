@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 const InterviewSummary = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const resumeId = useSelector((state) => state.resume.resumeId);
+    const resume_id = "bda069a3-9998-4648-93fc-2ce6022ad923"
     const questions = [
         {
             question: "What is the capital of France?",
@@ -21,36 +25,20 @@ const InterviewSummary = () => {
             options: ["Oxygen", "Osmium", "Ozone", "Oganesson"],
         },
     ];
-   
-    // Sample:
-    // Request:
-    //  curl -X POST https://ai-interview.unojobs.com:8000/api/v1/summary/bda069a3-9998-4648-93fc-2ce6022ad923 -H "Content-Type: application/json" -d 
-    
-    
-    // Response:
-    //  Stream of .....
-    // {           "id": id,
-    //             "transcription": transcription,
-    //             "gpt_response": gpt_response,
-    //             "transcription_audio": transcription_audio,
-    //             "gpt_response_audio": gpt_response_audio,
-    //             "created_at": reated_at
-    // }
-    
-    // > NOTE: THIS IS A STREAM OF CONVERSATIONS, NOT A JSON LIST,  THIS APPROACH IS USED TO HANDLE LONGER CONVERSATION AND AUDIO RESPONSES.
-    
-    
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // setLoading(true);
-                // const response = await fetch('https://api.example.com/data');
-                // if (!response.ok) {
-                //     throw new Error('Network response was not ok');
-                // }
-                // const result = await response.json();
-                // setData(result);
-                console.log(localStorage.getItem("AllVideoURL"))
+                setLoading(true);
+                const response = await axios.post(`https://ai-interview.unojobs.com:8000/api/v1/summary/${resumeId}`, resume_id);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                if (response && response !== undefined) {
+                    const result = await response.json();
+                    // setData(result);
+                    console.log(response)
+                    console.log(localStorage.getItem("AllVideoURL"))
+                }
 
             } catch (error) {
                 setError(error);

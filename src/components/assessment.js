@@ -63,6 +63,7 @@ const AssessmentPage = () => {
     const startRecording = (LEAVE) => {
         console.log(LEAVE, "leave value to check closed ")
         setIsRecording(true);
+        setFirstTimeStart(false)
         setTimer(0);
         const mediaRecorder = new MediaRecorder(streamRef.current);
         mediaRecorderRef.current = mediaRecorder;
@@ -222,7 +223,7 @@ const AssessmentPage = () => {
                     </button>
                 )}
             </div>
-            {!defaultInstruction && baseAudio && (
+            {!defaultInstruction && baseAudio && isRecording && (
                 <audio controls autoPlay className="btn-margin">
                     <source src={baseAudio} type="audio/mp3" />
                 </audio>
@@ -230,7 +231,7 @@ const AssessmentPage = () => {
             {!defaultInstruction && firstTimeStart && (
                 <h3 className="text-align">Hi, I am Rea. Once you are ready, click on the Start Button</h3>
             )}
-            {!defaultInstruction && isRecording && !firstTimeStart && (
+            {!defaultInstruction && isRecording &&(
                 <h3 className="text-align">{questions}</h3>
             )}
 
